@@ -1,0 +1,159 @@
+##############################################################
+#   This code is part of the Phd Thesis "Interactions between pest attacks and plant growth
+# using a model approach applied to robusta coffee in Uganda. Effects on production"
+# and the DeSira project in Uganda.
+#
+# Main Author: Houssem E.M TRIKI CIRAD-PHIM/AMAP
+# Co authors: Marc Jaeger, Fabienne Rebeyre
+# Created: June 2022
+##############################################################
+#------------------------------------------------- User ----------------------------------------------------------
+# MIMIC parameters
+UserModel:
+  Is_model_active: true             
+  Name: MIMIC
+  Version: 0.9
+  Language: Julia
+  PathToFile: /MIMIC
+  Perfs: false
+  Nature_of_Step:
+    Nature: Day
+    Unit_step_size: 1
+    End_Simulation: 354
+    Step_offset: 1
+  Variables:
+    State_variables: [harvest_day, HarvestHealthy, HarvestColonized]
+    Inputs: []
+    Myrefdir: /MIMIC/MIMIC.jl
+    Outputs: [harvest_day, HarvestHealthy, HarvestColonized, GreenHealthy, GreenColonized]
+  Interaction_Data:
+    Myrefdir: /MIMIC_UIM.jl
+    Language: julia
+    Function:
+      Call: MIMIC_system_stats
+      Arguments: fruitsCohorts, fruitsOfInterest, AR, AG, Simulation_Time
+      File: false
+      Output: fruitsCohorts, fruitsOfInterest
+    
+
+#-------------------------------------------------Climate----------------------------------------------------------
+Model1: 
+  Is_model_active: true
+  Name: Climate
+  Version: 1.0
+  language: CSV
+  PathToFile: /Interaction_CBB_Fruits_Human/Climate_model/Climate_module.jl
+  Perfs: false
+  Nature_of_Step: 
+    Nature: Day
+    Unit_step_size: 1
+    End_Simulation: 1
+    Step_offset: 1
+  Variables:
+    State_variables: [temperature, humidity, rain]
+    Inputs: 
+    Myrefdir: /Interaction_CBB_Fruits_Human/Climat_data
+    Outputs: [environment]
+  Function: 
+      Call: 
+      Arguments: 
+      File: 
+ 
+
+#------------------------------------------------ Tree ---------------------------------------------------------
+Model2:
+  Is_model_active: true
+  Name: Coffee_tree
+  Version: 0.9
+  language: Julia
+  PathToFile: /Interaction_CBB_Fruits_Human/Fruit_model/Plant_Fruit_Dev.jl
+  Perfs: false
+  Nature_of_Step: 
+    Nature: Day
+    Unit_step_size: 1
+    End_Simulation: 354
+    Step_offset: 1
+  Variables:
+    State_variables: [fruitsCohorts]
+    Inputs: /Interaction_CBB_Fruits_Human/Fruit_model/Plant_fruits/Sumatra_Fruits_C52.csv
+    Myrefdir: D:/Mes Donnees/Julia/cbb_model/Plant_fruits
+    Outputs: [fruitsCohorts, sumatraFruits]
+  Function: 
+    Call: FruitInitialisation
+    Arguments: /Interaction_CBB_Fruits_Human/Fruit_model/Plant_fruits/Sumatra_Fruits_C52.csv
+    File: true
+
+
+#------------------------------------------------- CBB ---------------------------------------------------------
+Model3: 
+  Is_model_active: true
+  Name: CBB
+  Version: 0.9
+  language: Julia
+  PathToFile: /Interaction_CBB_Fruits_Human/cbb_model/CBB_main.jl
+  Perfs: false
+  Nature_of_Step: 
+    Nature: Day
+    Unit_step_size: 1
+    End_Simulation: 354
+    Step_offset: 1
+  Variables:
+    State_variables: [fruitsOfInterest, scolyteGroup, AG, AR]
+    Inputs: [Day]
+    Myrefdir: 
+    Outputs: [fruitsOfInterest, AG, AR]
+  Function:
+    Call: CBB
+    Arguments: Day
+    File: false
+
+#------------------------------------------------ Human -----------------------------------------------------------
+
+Model4: 
+  Is_model_active: true
+  Name: Human
+  Version: 1
+  language: Julia
+  PathToFile: /Interaction_CBB_Fruits_Human/Human_model/Human_intervention.jl
+  Perfs: false
+  Nature_of_Step: 
+    Nature: Day
+    Unit_step_size: 1
+    End_Simulation: 354
+    Step_offset: 1
+  Variables:
+    State_variables: [fruitsCohorts, HarvestHealthy, HarvestColonized, GreenHealthy, GreenColonized]
+    Inputs: [fruitsCohorts, Simulation_Time,  "./Interaction_CBB_Fruits_Human/Fruit_model/Plant_fruits/Sumatra_Fruits_C52.csv"]
+    Myrefdir:
+    Outputs: [fruitsCohorts, HarvestHealthy, HarvestColonized, GreenHealthy, GreenColonized]
+  Function:
+    Call: Human_Intervention_Harvest
+    Arguments: fruitsCohorts, Day, "./Interaction_CBB_Fruits_Human/Fruit_model/Plant_fruits/Sumatra_Fruits_C52.csv"
+    File: false
+
+#-----------------------------------------------------------------------------------------------------------------
+# Model template parameters
+Modeln: 
+  Is_model_active: false
+  Name:
+  Version:
+  language:
+  PathToFile:
+  Perfs: 
+  Nature_of_Step: 
+    Nature:
+    Unit_step_size: 
+    End_Simulation: 
+    Step_offset: 
+  Variables:
+    State_variables:
+    Inputs:
+    Myrefdir:
+    Outputs:
+  Function:
+    Call:
+    Arguments:
+    File: 
+
+
+
